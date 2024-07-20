@@ -120,8 +120,15 @@ S5 = np.array([[0.67, 0.83, 0.24, 0.07, 0.54, 0.15, 0.79, 0.44, 0.93, 0.49],
 p5 = np.array([0.11, 0.12, 0.07, 0.1, 0.05, 0.13, 0.1, 0.11, 0.11, 0.1])
 
 if __name__ == "__main__":
+    """ Original code:
     num_of_likes = simulate_interaction(L1, S1, p1)
     print(num_of_likes)
+    """
+
+    num_of_likes = []
+    for i in range(1000):
+      num_of_likes.append(simulate_interaction(L1, S1, p1))
+    print(np.mean(np.array(num_of_likes)))
 
 
 
