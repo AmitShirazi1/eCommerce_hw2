@@ -4,7 +4,6 @@ import numpy as np
 class Recommender:
     # Your recommender system class
    
-
     def __init__(self, L, S, p):
         """_summary_
         
@@ -22,7 +21,8 @@ class Recommender:
         self.successes = np.ones((self.num_genres, self.num_user_types))
         self.failures = np.ones((self.num_genres, self.num_user_types))
     
-   
+    # Take the simulation code from simulation.py and run 1 turn (not 15).
+    # Define success and failure as 1 and 0.
          
     def calculate_staying_probability(self, L, S):
         stay_prob = 10*L + S * (1 - L)
