@@ -1,5 +1,5 @@
 import numpy as np
-from ID1_ID2_part2 import Recommender
+from part2 import Recommender
 import time
 
 MAX_HORIZON = 15
@@ -125,10 +125,28 @@ if __name__ == "__main__":
     print(num_of_likes)
     """
 
-    num_of_likes = []
-    for i in range(1000):
-      num_of_likes.append(simulate_interaction(L1, S1, p1))
-    print(np.mean(np.array(num_of_likes)))
+    num_of_likes_1, num_of_likes_2, num_of_likes_3a, num_of_likes_3b, num_of_likes_3c, num_of_likes_4, num_of_likes_5 = [],[],[],[],[],[],[]
+
+
+    for i in range(20):
+      
+        num_of_likes_1.append(simulate_interaction(L1, S1, p1))
+        num_of_likes_2.append(simulate_interaction(L2, S2, p2))
+        num_of_likes_3a.append(simulate_interaction(L3, S3, p3a))
+        num_of_likes_3b.append(simulate_interaction(L3, S3, p3b))
+        num_of_likes_3c.append(simulate_interaction(L3, S3, p3c))
+        num_of_likes_4.append(simulate_interaction(L4, S4, p4))
+        num_of_likes_5.append(simulate_interaction(L5, S5, p5))
+
+  #  print("SCORE TEST 1: ", sum(num_of_likes_1)/len(num_of_likes_1))
+    print("SCORE TEST 1: ",np.mean(np.array(num_of_likes_1)))
+    print("SCORE TEST 2: ",np.mean(np.array(num_of_likes_2)))
+    print("SCORE TEST 3a: ",np.mean(np.array(num_of_likes_3a)))
+    print("SCORE TEST 3b: ",np.mean(np.array(num_of_likes_3b)))
+    print("SCORE TEST 3c: ",np.mean(np.array(num_of_likes_3c)))
+    print("SCORE TEST 4: ",np.mean(np.array(num_of_likes_4)))
+    print("SCORE TEST 5: ",np.mean(np.array(num_of_likes_5)))
+
 
 
 
