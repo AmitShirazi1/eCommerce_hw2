@@ -126,26 +126,56 @@ if __name__ == "__main__":
     """
 
     num_of_likes_1, num_of_likes_2, num_of_likes_3a, num_of_likes_3b, num_of_likes_3c, num_of_likes_4, num_of_likes_5 = [],[],[],[],[],[],[]
+    #seed
+    np.random.seed(0)
+    def test(L1, S1, p1):
+        num_of_likes = list()
+        for i in range(10):
+            print("\n", "-"*20, "\n")
+            num_of_likes.append(simulate_interaction(L1, S1, p1))
+        return sum(num_of_likes)/len(num_of_likes)
+    
+    result = test(L1, S1, p1)
+    print("SCORE TEST 1:", result, "pass" if result>4.65 else "fail")
+    result = test(L2, S2, p2)
+    print("\n", "-"*20, "\n")
+    print("SCORE TEST 2:", result, "pass" if result>5.6 else "fail")
+    result = test(L3, S3, p3a)
+    print("\n", "-"*20, "\n")
+    print("SCORE TEST 3a:", result, "pass" if result>12.4 else "fail")
+    result = test(L3, S3, p3b)
+    print("\n", "-"*20, "\n")
+    print("SCORE TEST 3b:", result, "pass" if result>6.1 else "fail")
+    result = test(L3, S3, p3c)
+    print("\n", "-"*20, "\n")
+    print("SCORE TEST 3c:", result, "pass" if result>6.77 else "fail")
+    result = test(L4, S4, p4)
+    print("\n", "-"*20, "\n")
+    print("SCORE TEST 4:", result, "pass" if result>5.43 else "fail")
+    result = test(L5, S5, p5)
+    print("\n", "-"*20, "\n")
+    print("SCORE TEST 5:", result, "pass" if result>6.4 else "fail") 
 
 
-    for i in range(20):
+
+    # for i in range(10):
       
-        num_of_likes_1.append(simulate_interaction(L1, S1, p1))
-        num_of_likes_2.append(simulate_interaction(L2, S2, p2))
-        num_of_likes_3a.append(simulate_interaction(L3, S3, p3a))
-        num_of_likes_3b.append(simulate_interaction(L3, S3, p3b))
-        num_of_likes_3c.append(simulate_interaction(L3, S3, p3c))
-        num_of_likes_4.append(simulate_interaction(L4, S4, p4))
-        num_of_likes_5.append(simulate_interaction(L5, S5, p5))
+        # num_of_likes_1.append(simulate_interaction(L1, S1, p1))
+        # num_of_likes_2.append(simulate_interaction(L2, S2, p2))
+        # num_of_likes_3a.append(simulate_interaction(L3, S3, p3a))
+        # num_of_likes_3b.append(simulate_interaction(L3, S3, p3b))
+        # num_of_likes_3c.append(simulate_interaction(L3, S3, p3c))
+        # num_of_likes_4.append(simulate_interaction(L4, S4, p4))
+        # num_of_likes_5.append(simulate_interaction(L5, S5, p5))
 
   #  print("SCORE TEST 1: ", sum(num_of_likes_1)/len(num_of_likes_1))
-    print("SCORE TEST 1: ",np.mean(np.array(num_of_likes_1)))
-    print("SCORE TEST 2: ",np.mean(np.array(num_of_likes_2)))
-    print("SCORE TEST 3a: ",np.mean(np.array(num_of_likes_3a)))
-    print("SCORE TEST 3b: ",np.mean(np.array(num_of_likes_3b)))
-    print("SCORE TEST 3c: ",np.mean(np.array(num_of_likes_3c)))
-    print("SCORE TEST 4: ",np.mean(np.array(num_of_likes_4)))
-    print("SCORE TEST 5: ",np.mean(np.array(num_of_likes_5)))
+    # print("SCORE TEST 1: "+str(np.mean(np.array(num_of_likes_1)))," pass" if np.mean(np.array(num_of_likes_1))>4.65 else "fail")
+    # print("SCORE TEST 2:  "+str(np.mean(np.array(num_of_likes_2)))," pass" if np.mean(np.array(num_of_likes_2))>5.6 else "fail")
+    # print("SCORE TEST 3a:  "+str(np.mean(np.array(num_of_likes_3a)))," pass" if np.mean(np.array(num_of_likes_3a))>12.4 else "fail")
+    # print("SCORE TEST 3b:  "+str(np.mean(np.array(num_of_likes_3b)))," pass" if np.mean(np.array(num_of_likes_3b))>6.1 else "fail")
+    # print("SCORE TEST 3c: "+str(np.mean(np.array(num_of_likes_3c)))," pass" if np.mean(np.array(num_of_likes_3c))>6.77 else "fail")
+    # print("SCORE TEST 4:  "+str(np.mean(np.array(num_of_likes_4)))," pass" if np.mean(np.array(num_of_likes_4))>5.43 else "fail")
+    # print("SCORE TEST 5:  "+str(np.mean(np.array(num_of_likes_5)))," pass" if np.mean(np.array(num_of_likes_5))>6.4 else "fail")
 
 
 
