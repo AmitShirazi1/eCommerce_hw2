@@ -65,19 +65,20 @@ class Recommender:
 
 
     def calculate_staying_probability(self, L, S, p):
-        stay_prob = 5*L + S * (1 - L)#probability of staying in the system after not liking the clip and if liked the clip
+        stay_prob = 5*L + S*(1 - L)#probability of staying in the system after not liking the clip and if liked the clip
         # Normalize each row to sum to 1
        # if max(L) >0.9: 
-        #S_adjusted = stay_prob / stay_prob.sum(axis=1, keepdims=True)
-        stay_prob_sum = stay_prob.sum(axis=1, keepdims=True)
-         # Calculate the user-weighted adjustment
-         # Reshape p to ensure correct broadcasting
-        p_reshaped = p[:, np.newaxis]
-         
-        weighted_stay_prob = stay_prob* p_reshaped
-
+        for i in range(len(stay_prob)):
+            stay_prob[i] = stay_prob[i] / stay_prob[i].sum()
+        S_adjusted = stay_prob
+        # TODO: The following doesn't make sense, especially reshaping p. 
+        # stay_prob_sum = stay_prob.sum(axis=1, keepdims=True)
+        #  # Calculate the user-weighted adjustment
+        #  # Reshape p to ensure correct broadcasting
+        # p_reshaped = p[:, np.newaxis]
+        # weighted_stay_prob = stay_prob * p_reshaped
         # Normalize the adjusted probabilities to ensure they sum to 1 for each user
-        S_adjusted = weighted_stay_prob / stay_prob_sum
+        # S_adjusted = weighted_stay_prob / stay_prob_sum
 
         return S_adjusted
      
@@ -98,7 +99,8 @@ class Recommender:
         recommendation = np.argmax(posterior)
 
         self.recommended_item = recommendation
-       # print("recommendation", recommendation)
+        print("\nTurn number", self.i)
+        print("Recommended item:", self.recommended_item)
         return recommendation
     
     
@@ -110,12 +112,9 @@ class Recommender:
         signal (integer): A binary variable that represents whether the user liked the recommended clip or not. 
                           It is 1 if the user liked the clip, and 0 otherwise."""
         self.i += 1
-        print("\nTurn number", self.i)
-        print("Recommended item:", self.recommended_item)
         print("Signal:", signal)
-        if signal:
-            self.successes_per_genre[self.recommended_item] += 1
-            
+
+        self.successes_per_genre[self.recommended_item] += signal
         self.num_simulations_per_genre[self.recommended_item] += 1
         self.successes += signal
         self.num_simulations += 1
@@ -131,11 +130,10 @@ class Recommender:
 
             posterior_of_genres_recommendations[i] = genre_score* (self.successes_per_genre[i] / self.num_simulations_per_genre[i])**(1/2)  / (self.successes / self.num_simulations)**(1/2)
             posterior_of_genres_recommendations[i] = posterior_of_genres_recommendations[i]**10
-            if i == self.recommended_item:
-                if signal:# more weight to the genres that are liked
-                    posterior_of_genres_recommendations[i] = posterior_of_genres_recommendations[i]*10
-                else:#less weight to the genres that are not liked
-                    posterior_of_genres_recommendations[i] = posterior_of_genres_recommendations[i]
+            if (i == self.recommended_item) and signal:# more weight to the genres that are liked
+                    posterior_of_genres_recommendations[i] = posterior_of_genres_recommendations[i]**(1/2)
+            else:#less weight to the genres that are not liked
+                posterior_of_genres_recommendations[i] = posterior_of_genres_recommendations[i]**2
         self.posterior_of_genres_recommendations = posterior_of_genres_recommendations / posterior_of_genres_recommendations.sum()  # Normalize to create a probability distribution
         print("Posterior distribution:", self.posterior_of_genres_recommendations)
        
