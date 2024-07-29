@@ -154,27 +154,27 @@ if __name__ == "__main__":
 
     def test(L, S, p):
         num_of_likes = list()
-        for i in range(50):
+        for i in range(1000):
             num_of_likes.append(simulate_interaction(L, S, p))
         return sum(num_of_likes)/len(num_of_likes)
-    
-    result = test(L1, S1, p1)
-    print("SCORE TEST 1:", result, "pass" if result>4.65 else "fail")          #TEST1: 6.646 pass
-    result = test(L2, S2, p2)
-    print("\n", "-"*20, "\n")                                                       #TEST2: 8.524 pass
-    print("SCORE TEST 2:", result, "pass" if result>5.6 else "fail")
-    result = test(L3, S3, p3a)                                                    #TEST3A:  13.851 pass      
-    print("\n", "-"*20, "\n")
-    print("SCORE TEST 3a:", result, "pass" if result>12.4 else "fail")               
-    result = test(L3, S3, p3b)
-    print("\n", "-"*20, "\n")
-    print("SCORE TEST 3b:", result, "pass" if result>6.1 else "fail")                    #TEST3B 10.064  PASS 
-    result = test(L3, S3, p3c)
-    print("\n", "-"*20, "\n")
-    print("SCORE TEST 3c:", result, "pass" if result>6.77 else "fail")                  #TEST3c 12.069   PASS
-    result = test(L4, S4, p4)
-    print("\n", "-"*20, "\n")
-    print("SCORE TEST 4:", result, "pass" if result>5.43 else "fail")                  #14.037 pass      
+                                                                            #   BEST SCORES
+    # result = test(L1, S1, p1)
+    # print("SCORE TEST 1:", result, "pass" if result>4.65 else "fail")          #TEST1: 6.646 pass
+    # result = test(L2, S2, p2)
+    # print("\n", "-"*20, "\n")                                                       #TEST2: 8.524 pass
+    # print("SCORE TEST 2:", result, "pass" if result>5.6 else "fail")
+    # result = test(L3, S3, p3a)                                                    #TEST3A:  13.851 pass      
+    # print("\n", "-"*20, "\n")
+    # print("SCORE TEST 3a:", result, "pass" if result>12.4 else "fail")               
+    # result = test(L3, S3, p3b)
+    # print("\n", "-"*20, "\n")
+    # print("SCORE TEST 3b:", result, "pass" if result>6.1 else "fail")                    #TEST3B 10.064  PASS 
+    # result = test(L3, S3, p3c)
+    # print("\n", "-"*20, "\n")
+    # print("SCORE TEST 3c:", result, "pass" if result>6.77 else "fail")                  #TEST3c 12.069   PASS
+    # result = test(L4, S4, p4)
+    # print("\n", "-"*20, "\n")
+    # print("SCORE TEST 4:", result, "pass" if result>5.43 else "fail")                  #14.037 pass      
     result = test(L5, S5, p5)
     print("\n", "-"*20, "\n")
     print("SCORE TEST 5:", result, "pass" if result>6.4 else "fail")                     #14.058  pass

@@ -61,7 +61,7 @@ S5 = np.array([[0.67, 0.83, 0.24, 0.07, 0.54, 0.15, 0.79, 0.44, 0.93, 0.49],
 p5 = np.array([0.11, 0.12, 0.07, 0.1, 0.05, 0.13, 0.1, 0.11, 0.11, 0.1])
 
 
-L,S=L5, S5        
+L,S=L5, S5      
 """Simulate user interactions based on like probabilities (L) and staying probabilities (S)."""
 num_genres, num_user_types = L.shape
 # Initialize the simulation matrix if it's not already initialized
@@ -70,7 +70,7 @@ simul_matrix = np.zeros((num_genres, num_user_types))
 start_time =time()  # Corrected to use time.time() for start time capture
 num_iterations = np.zeros((num_genres, num_user_types))  # Each cell has its own iteration count
 
-while time() - start_time < 25:
+while time() - start_time < 40:
     for g in range(num_genres):
         for u in range(num_user_types):
             cumulative_likes = 0
@@ -90,3 +90,5 @@ while time() - start_time < 25:
                 # Update the simulation matrix with the new average for this interaction session
                 num_iterations[g, u] += 1  # Increment the number of total iterations for this cell
                 simul_matrix[g, u] += (cumulative_likes - simul_matrix[g, u]) / num_iterations[g, u]
+
+           
