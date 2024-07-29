@@ -21,40 +21,6 @@ class Recommender:
         self.recommendation = None
         self.simul_matrix = simul_matrix
 
-    def simulation(self, L, S):
-        """Simulate user interactions based on like probabilities (L) and staying probabilities (S)."""
-        num_genres, num_user_types = L.shape
-        simul_matrix = np.zeros((num_genres, num_user_types))
-
-        max_time = 25  # Maximum time for simulation in seconds
-        start_time = time()
-        num_iterations = np.zeros((num_genres, num_user_types))  # Each cell has its own iteration count
-
-        while time() - start_time < max_time:
-            # Generate random interactions for all genre-user pairs
-            likes = np.random.rand(num_genres, num_user_types, 15) < L[:, :, np.newaxis]
-            stays = np.random.rand(num_genres, num_user_types, 15) < (L[:, :, np.newaxis] + (1 - L[:, :, np.newaxis]) * S[:, :, np.newaxis])
-            
-            for g in range(num_genres):
-                for u in range(num_user_types):
-                    interaction_likes = likes[g, u]
-                    interaction_stays = stays[g, u]
-                    cumulative_likes = 0
-                    interactions = 0  # Track the number of interactions for this genre-user pair
-
-                    for i in range(15):
-                        if interaction_stays[i] or interaction_likes[i]:
-                            cumulative_likes += interaction_likes[i]
-                            interactions += 1  # Increment interactions only if there was an interaction
-                        else:
-                            break
-
-                    if interactions > 0:  # Check to avoid division by zero
-                        num_iterations[g, u] += 1  # Increment the number of total iterations for this cell
-                        simul_matrix[g, u] += (cumulative_likes - simul_matrix[g, u]) / num_iterations[g, u]
-
-        return simul_matrix
-
 
 
 
@@ -100,31 +66,6 @@ class Recommender:
         self.recommendation = recommendation
         return recommendation
 
-    # def update(self, signal):
-    #     """Update the prior probabilities based on the user's response.
-
-    #     Args:
-    #     signal (integer): A binary variable that represents whether the user liked the recommended clip or not. 
-    #                       It is 1 if the user liked the clip, and 0 otherwise.
-    #     """
-    #     if signal:
-    #         # User liked the recommendation
-    #         likelihood = self.simul_matrix[self.recommendation]
-    #     else:
-    #         # User did not like the recommendation
-    #         likelihood = self.S[self.recommendation]
-        
-    #     # Update the prior with the likelihood
-    #     self.p *= likelihood
-        
-    #     if np.sum(self.p) > 0:  # Ensure there is no division by zero
-    #         # Normalize the probabilities to ensure they sum to 1
-    #         self.p = self.p / np.sum(self.p)
-    #     # else:
-    #     #     raise ValueError("Sum of updated probabilities is zero. Cannot normalize.")
-
-    #     # # Debugging: Print the updated probabilities
-    #     # print("Updated probabilities:", self.p)
 
 
     def update(self, signal):
