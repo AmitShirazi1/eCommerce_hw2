@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
     def test(L, S, p):
         num_of_likes = []
-        for _ in range(500):
+        for _ in range(5000):
             num_of_likes.append(simulate_interaction(L, S, p))
         
         mean_likes = np.mean(num_of_likes)
@@ -182,24 +182,25 @@ if __name__ == "__main__":
     #     variance_likes = 
     #     return sum(num_of_likes)/len(num_of_likes)
     
-                                                                            #   BEST SCORES
+                                                                            #  #  With deep copy 
+                                                                                                                  # BEST SCORES
     # result = test(L1, S1, p1)
-    # print("SCORE TEST 1:", result, "pass" if result>4.65 else "fail")          #TEST1: 5.52 pass, 95% Confidence interval: (4.6560291954157655, 6.383970804584234)
+    # print("SCORE TEST 1:", result, "pass" if result>4.65 else "fail")    #         SCORE TEST 1: 4.6638 pass       95% Confidence interval: (4.541521861126632, 4.786078138873369)                                                                        #TEST1: 5.52 pass, 95% Confidence interval: (4.6560291954157655, 6.383970804584234)
     # result = test(L2, S2, p2)
-    # print("\n", "-"*20, "\n")                                                       #TEST2: 7.32 pass 95% Confidence interval: (6.274651845612772, 8.365348154387227)
-    # print("SCORE TEST 2:", result, "pass" if result>5.6 else "fail")
-    # result = test(L3, S3, p3a)                                                    #TEST3A:  13.851 pass  95% Confidence interval: (13.208321347784223, 14.591678652215778)     
+    # print("\n", "-"*20, "\n")                                                                                                                                                  #TEST2: 7.32 pass 95% Confidence interval: (6.274651845612772, 8.365348154387227)
+    # print("SCORE TEST 2:", result, "pass" if result>5.6 else "fail")                   
+    # result = test(L3, S3, p3a)                                                     SCORE TEST 2: 5.6246 pass     95% Confidence interval: (5.489259741757225, 5.759940258242775)                                                                                       #TEST3A:  13.851 pass  95% Confidence interval: (13.208321347784223, 14.591678652215778)     
     # print("\n", "-"*20, "\n")
-    # print("SCORE TEST 3a:", result, "pass" if result>12.4 else "fail")               
+    # print("SCORE TEST 3a:", result, "pass" if result>12.4 else "fail")             #  SCORE TEST 3a: 12.5266 pass 95% Confidence interval: (12.383743863792745, 12.669456136207256)
     # result = test(L3, S3, p3b)
     # print("\n", "-"*20, "\n")
-    # print("SCORE TEST 3b:", result, "pass" if result>6.1 else "fail")                    #TEST3B 8.65  PASS  95% Confidence interval: (7.873231031871523, 9.426768968128478)
+    # print("SCORE TEST 3b:", result, "pass" if result>6.1 else "fail")               # TEST 3b: 4.917 FAIL     95% Confidence interval: (4.63316487951032, 5.200835120489679)                                                                                      #TEST3B 8.65  PASS  95% Confidence interval: (7.873231031871523, 9.426768968128478)
     # result = test(L3, S3, p3c)
     # print("\n", "-"*20, "\n")
-    # print("SCORE TEST 3c:", result, "pass" if result>6.77 else "fail")                  #TEST3c 7.896  PASS 95% Confidence interval: (7.400664128652017, 8.391335871347982
+    # print("SCORE TEST 3c:", result, "pass" if result>6.77 else "fail")         # SCORE TEST 3c: 5.162 FAIL     95% Confidence interval: (4.869960971426735, 5.4540390285732645)                                                                                          #TEST3c 7.896  PASS 95% Confidence interval: (7.400664128652017, 8.391335871347982
     # result = test(L4, S4, p4)
     # print("\n", "-"*20, "\n")
-    # print("SCORE TEST 4:", result, "pass" if result>5.43 else "fail")                  #8.48 PASS  95% Confidence interval: (7.99145407905557, 8.96854592094443)
+    # print("SCORE TEST 4:", result, "pass" if result>5.43 else "fail")   #  TEST 4: 7.195 pass  95% Confidence   interval: (6.831488279210672, 7.558511720789329)            #TEST 4: 8.48 PASS  95% Confidence interval: (7.99145407905557, 8.96854592094443)
     result = test(L5, S5, p5)
     print("\n", "-"*20, "\n")
-    print("SCORE TEST 5:", result, "pass" if result>6.4 else "fail")                     #13.91 PASS 95% Confidence interval: (13.723549234318899, 14.096450765681102)
+    print("SCORE TEST 5:", result, "pass" if result>6.4 else "fail") # SCORE TEST 5: 6.4658 pass  5% Confidence interval: (6.312302383948852, 6.619297616051147)                                                                                      # Test 5: 13.91 PASS 95% Confidence interval: (13.723549234318899, 14.096450765681102)
