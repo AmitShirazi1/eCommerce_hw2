@@ -4,3 +4,4 @@ __pycache__/
 ID*.csv
 *.ipynb
 *.docx
+.gitignore
