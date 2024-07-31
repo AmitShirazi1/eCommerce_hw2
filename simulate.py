@@ -1,6 +1,7 @@
 import numpy as np
-from part2 import Recommender
+from ID1_ID2_part2 import Recommender
 import time
+from scipy import stats 
 
 MAX_HORIZON = 15
 
@@ -120,65 +121,80 @@ S5 = np.array([[0.67, 0.83, 0.24, 0.07, 0.54, 0.15, 0.79, 0.44, 0.93, 0.49],
 p5 = np.array([0.11, 0.12, 0.07, 0.1, 0.05, 0.13, 0.1, 0.11, 0.11, 0.1])
 
 if __name__ == "__main__":
-    """ Original code:
-    num_of_likes = simulate_interaction(L1, S1, p1)
-    print(num_of_likes)
-    """
+    # num_of_likes = simulate_interaction(L1, S1, p1)
+    # print(num_of_likes)
 
-    num_of_likes_1, num_of_likes_2, num_of_likes_3a, num_of_likes_3b, num_of_likes_3c, num_of_likes_4, num_of_likes_5 = [],[],[],[],[],[],[]
-    #seed
-    np.random.seed(0)
-    def test(L1, S1, p1):
-        num_of_likes = list()
-        for i in range(10):
-            print("\n", "-"*20, "\n")
-            num_of_likes.append(simulate_interaction(L1, S1, p1))
-        return sum(num_of_likes)/len(num_of_likes)
     
+
+    # num_of_likes = simulate_interaction(L1, S1, p1)
+    # print("1:", num_of_likes)
+    # num_of_likes = simulate_interaction(L2, S2, p2)
+    # print("2:", num_of_likes)
+    # num_of_likes = simulate_interaction(L3, S3, p3a)
+    # print("3a:", num_of_likes)
+    # num_of_likes = simulate_interaction(L3, S3, p3b)
+    # print("3b:", num_of_likes)
+    # num_of_likes = simulate_interaction(L3, S3, p3c)
+    # print("3c:", num_of_likes)
+    # num_of_likes = simulate_interaction(L4, S4, p4)
+    # print("4:", num_of_likes)
+    # num_of_likes = simulate_interaction(L5, S5, p5)
+    # print("5:", num_of_likes)
+
+
+    def test(L, S, p):
+        num_of_likes = []
+        for _ in range(5000):
+            num_of_likes.append(simulate_interaction(L, S, p))
+        
+        mean_likes = np.mean(num_of_likes)
+        std_likes = np.std(num_of_likes, ddof=1)  # Sample standard deviation
+        n = len(num_of_likes)
+        standard_error = std_likes / np.sqrt(n)
+        
+        # 95% confidence interval
+        confidence_level = 0.95
+        degrees_freedom = n - 1
+        t_critical = stats.t.ppf((1 + confidence_level) / 2, degrees_freedom)
+        margin_of_error = t_critical * standard_error
+        
+        confidence_interval = (mean_likes - margin_of_error, mean_likes + margin_of_error)
+        
+        print(f"Mean number of likes: {mean_likes}")
+        print(f"95% Confidence interval: {confidence_interval}")
+        
+        return mean_likes
+
+
+
+    # def test(L, S, p):
+    #     num_of_likes = list()
+    #     for _ in range(100):
+    #         num_of_likes.append(simulate_interaction(L, S, p))
+    #     print(num_of_likes)    
+    #     variance_likes = 
+    #     return sum(num_of_likes)/len(num_of_likes)
+    
+                                                                            #  #  With deep copy 
+                                                                                                                #  BEST SCORES
     # result = test(L1, S1, p1)
-    # print("SCORE TEST 1:", result, "pass" if result>4.65 else "fail")
+    # print("SCORE TEST 1:", result, "pass" if result>4.65 else "fail")    #        SCORE TEST 1: 4.7202 pass       95% Confidence interval: (4.596411069951142, 4.843988930048859)                                                                       
     # result = test(L2, S2, p2)
+    # print("\n", "-"*20, "\n")                                                                                                                                                  
+    # print("SCORE TEST 2:", result, "pass" if result>5.6 else "fail")           #SCORE TEST 2: 5.629 pass    95% Confidence interval: (5.4941352385338895, 5.76386476146611)
+
+    # result = test(L3, S3, p3a)                                              #SCORE TEST 2: 5.6246 pass     95% Confidence interval: (5.489259741757225, 5.759940258242775)                                                                                            
     # print("\n", "-"*20, "\n")
-    # print("SCORE TEST 2:", result, "pass" if result>5.6 else "fail")
-    result = test(L3, S3, p3a)
-    print("\n", "-"*20, "\n")
-    print("SCORE TEST 3a:", result, "pass" if result>12.4 else "fail")
-    result = test(L3, S3, p3b)
-    print("\n", "-"*20, "\n")
-    print("SCORE TEST 3b:", result, "pass" if result>6.1 else "fail")
-    result = test(L3, S3, p3c)
-    print("\n", "-"*20, "\n")
-    print("SCORE TEST 3c:", result, "pass" if result>6.77 else "fail")
-    result = test(L4, S4, p4)
-    print("\n", "-"*20, "\n")
-    print("SCORE TEST 4:", result, "pass" if result>5.43 else "fail")
+    # print("SCORE TEST 3a:", result, "pass" if result>12.4 else "fail")      #  SCORE TEST 3a: 12.4626 pass     95% Confidence interval: (12.320492521288875, 12.604707478711125
+    # result = test(L3, S3, p3b)
+    # print("\n", "-"*20, "\n")
+    # print("SCORE TEST 3b:", result, "pass" if result>6.1 else "fail")      #SCORE TEST 3b: 6.1122 pass    95% Confidence interval: (5.9464271780878155, 6.277972821912184)                                                                                   #TEST3B 8.65  PASS  95% Confidence interval: (7.873231031871523, 9.426768968128478)
+    # result = test(L3, S3, p3c)
+    # print("\n", "-"*20, "\n")
+    # print("SCORE TEST 3c:", result, "pass" if result>6.77 else "fail")     #SCORE TEST 3c: 6.7786 pass     95% Confidence interval: (6.611159540340323, 6.9460404596596765)                                                                                        #TEST3c 7.896  PASS 95% Confidence interval: (7.400664128652017, 8.391335871347982
+    # result = test(L4, S4, p4)
+    # print("\n", "-"*20, "\n")
+    # print("SCORE TEST 4:", result, "pass" if result>5.43 else "fail")      # SCORE TEST 4: 6.4286 pass        95% Confidence interval: (6.266846561323475, 6.590353438676526)           
     result = test(L5, S5, p5)
     print("\n", "-"*20, "\n")
-    print("SCORE TEST 5:", result, "pass" if result>6.4 else "fail") 
-
-
-
-    # for i in range(10):
-      
-        # num_of_likes_1.append(simulate_interaction(L1, S1, p1))
-        # num_of_likes_2.append(simulate_interaction(L2, S2, p2))
-        # num_of_likes_3a.append(simulate_interaction(L3, S3, p3a))
-        # num_of_likes_3b.append(simulate_interaction(L3, S3, p3b))
-        # num_of_likes_3c.append(simulate_interaction(L3, S3, p3c))
-        # num_of_likes_4.append(simulate_interaction(L4, S4, p4))
-        # num_of_likes_5.append(simulate_interaction(L5, S5, p5))
-
-  #  print("SCORE TEST 1: ", sum(num_of_likes_1)/len(num_of_likes_1))
-    # print("SCORE TEST 1: "+str(np.mean(np.array(num_of_likes_1)))," pass" if np.mean(np.array(num_of_likes_1))>4.65 else "fail")
-    # print("SCORE TEST 2:  "+str(np.mean(np.array(num_of_likes_2)))," pass" if np.mean(np.array(num_of_likes_2))>5.6 else "fail")
-    # print("SCORE TEST 3a:  "+str(np.mean(np.array(num_of_likes_3a)))," pass" if np.mean(np.array(num_of_likes_3a))>12.4 else "fail")
-    # print("SCORE TEST 3b:  "+str(np.mean(np.array(num_of_likes_3b)))," pass" if np.mean(np.array(num_of_likes_3b))>6.1 else "fail")
-    # print("SCORE TEST 3c: "+str(np.mean(np.array(num_of_likes_3c)))," pass" if np.mean(np.array(num_of_likes_3c))>6.77 else "fail")
-    # print("SCORE TEST 4:  "+str(np.mean(np.array(num_of_likes_4)))," pass" if np.mean(np.array(num_of_likes_4))>5.43 else "fail")
-    # print("SCORE TEST 5:  "+str(np.mean(np.array(num_of_likes_5)))," pass" if np.mean(np.array(num_of_likes_5))>6.4 else "fail")
-
-
-
-
-
-    
+    print("SCORE TEST 5:", result, "pass" if result>6.4 else "fail")       #SCORE TEST 5: 6.63 pass     95% Confidence interval: (6.312302383948852, 6.619297616051147)                                                                                   

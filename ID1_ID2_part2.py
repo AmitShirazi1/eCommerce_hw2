@@ -1,14 +1,14 @@
 import numpy as np
 from time import time
 from matrix_calc import simul_matrix
-from copy import deepcopy
+
 
 
 # This class is for simulating the 
 class Simulation:
     _instance = None # 
 
-    def __new__(cls, L=None, S=None, max_time=60, num_interactions=15):
+    def __new__(cls, L=None, S=None, max_time=40, num_interactions=15):
         if cls._instance is None:
             cls._instance = super(Simulation, cls).__new__(cls)
             cls._instance._initialize(L, S, max_time, num_interactions)
@@ -38,7 +38,7 @@ class Simulation:
 
                     for _ in range(self.num_interactions):
                         like = np.random.rand() < self.L[g, u]
-                        stay = like or np.random.rand() < (1-self.L[g,u])*(self.S[g, u])
+                        stay = like or np.random.rand() < (self.L[g, u] + (1 - self.L[g, u]) * self.S[g, u])
 
                         if not stay:
                             break
@@ -73,7 +73,7 @@ class Recommender:
         """
         self.S = S
         self.L = L
-        self.p = deepcopy(p) 
+        self.p = p 
         if Simulation._instance is None:
             Simulation(L, S)  # Instantiate Simulation class if it hasn't been instantiated yet
         self.simul_matrix = Simulation.get_simul_matrix()

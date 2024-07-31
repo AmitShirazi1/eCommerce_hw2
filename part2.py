@@ -1,295 +1,253 @@
 import numpy as np
 from time import time
+from matrix_calc import simul_matrix
+
+
+
+# This class is for simulating the 
+class Simulation:
+    _instance = None # 
+
+    def __new__(cls, L=None, S=None, max_time=40, num_interactions=15):
+        if cls._instance is None:
+            cls._instance = super(Simulation, cls).__new__(cls)
+            cls._instance._initialize(L, S, max_time, num_interactions)
+        return cls._instance
+
+    def _initialize(self, L, S, max_time, num_interactions): 
+        self.L = L
+        self.S = S
+        self.max_time = max_time
+        self.num_interactions = num_interactions
+        self.simul_matrix = self.calculate_simulation_matrix()
+
+
+    #simulation calculation of the matrix of usere types and genres
+    def calculate_simulation_matrix(self):
+        num_genres, num_user_types = self.L.shape
+        simul_matrix = np.zeros((num_genres, num_user_types))
+
+        start_time = time()
+        num_iterations = np.zeros((num_genres, num_user_types))
+
+        while time() - start_time < self.max_time:
+            for g in range(num_genres):
+                for u in range(num_user_types):
+                    cumulative_likes = 0
+                    interactions = 0
+
+                    for _ in range(self.num_interactions):
+                        like = np.random.rand() < self.L[g, u]
+                        stay = like or np.random.rand() < (self.L[g, u] + (1 - self.L[g, u]) * self.S[g, u])
+
+                        if not stay:
+                            break
+
+                        cumulative_likes += like
+                        interactions += 1
+
+                    if interactions > 0:
+                        num_iterations[g, u] += 1
+                        simul_matrix[g, u] += (cumulative_likes - simul_matrix[g, u]) / num_iterations[g, u]
+
+        return simul_matrix
+
+    @staticmethod
+    def get_simul_matrix():
+        if Simulation._instance is None:
+            raise ValueError("Simulation class has not been instantiated.")
+        return Simulation._instance.simul_matrix
+
 
 class Recommender:
-    # Your recommender system class
-   
+
     def __init__(self, L, S, p):
-        """_summary_
+        """Initialize the Recommender system.
         
         Args:
-        L (np.ndarray): A matrix in which the entry (i,j) represents the probability that a user of type j
-                         will give a like to a clip from genre i.
-        S (np.ndarray): A matrix in which the entry (i,j) represents the probability that a user of type j
+        L (np.ndarray): A matrix where entry (i,j) represents the probability that a user of type j
+                        will like a clip from genre i.
+        S (np.ndarray): A matrix where entry (i,j) represents the probability that a user of type j
                         won't leave the system after being recommended a clip from genre i and not liking it.
-        p (np.ndarray): The prior over user types. The entry i represents the probability that a user is of type i."""
+        p (np.ndarray): The prior over user types. Entry i is the probability that a user is of type i.
+        """
         self.S = S
         self.L = L
-        self.p = p
-        self.S_adjusted = self.calculate_staying_probability(L, S, p)
-        self.num_genres, self.num_user_types = L.shape
-        self.posterior_of_genres_recommendations, self.successes_per_genre, self.num_simulations_per_genre, self.successes, self.num_simulations = self.simulate_and_update_posterior()
-        self.i = 0
-
-
-    def simulate_and_update_posterior(self):
-        p, S_adjusted = self.p, self.S_adjusted
-        num_genres = S_adjusted.shape[0]
-        successes_per_genre = np.ones(num_genres)
-        num_simulations_per_genre = np.ones(num_genres)
-        total_successes = 1
-        total_simulations = 1
-        posterior_of_genres_recommendations = np.zeros(num_genres)
-        time_limit = 15
-        start_time = time()
-
-        while time() - start_time < time_limit:
-            for i in range(num_genres):
-                genre_score = np.dot(S_adjusted[i], p)  # Simplified genre score calculation
-                posterior_of_genres_recommendations[i] = genre_score * ((successes_per_genre[i] / num_simulations_per_genre[i]) ** (1/2))  / ((total_successes / total_simulations) ** (1/2))
-                posterior_of_genres_recommendations[i] = posterior_of_genres_recommendations[i]**10
-            posterior_of_genres_recommendations /= posterior_of_genres_recommendations.sum()  # Normalize to create a probability distribution
-
-            successes_per_genre, num_simulations_per_genre, total_successes, total_simulations = self.recommend_for_simulation(posterior_of_genres_recommendations, successes_per_genre, num_simulations_per_genre, total_successes, total_simulations)
-        print("Posterior distribution after init:", posterior_of_genres_recommendations)
-        return posterior_of_genres_recommendations, successes_per_genre, num_simulations_per_genre, total_successes, total_simulations
-
-
-    def recommend_for_simulation(self, posterior_of_genres_recommendations, successes_per_genre, num_simulations_per_genre, total_successes, total_simulations):
-        p = self.p
-        user = np.random.choice(range(len(p)), p=p)
-        for i in range(1, 16):
-            recommendation = np.random.choice(range(len(posterior_of_genres_recommendations)), p=posterior_of_genres_recommendations)
-
-            like = np.random.rand() < self.L[recommendation, user]
-            #staying_reward = 1/i if i < 15 else 0
-            stay = 1 if like else (self.S[recommendation, user]*(1-(i/15)) if np.random.rand() < self.S[recommendation, user] else 0)
-            
-            #stay=np.random.rand() < stay_prob
-            total_successes += stay
-            total_simulations += 1
-            successes_per_genre[recommendation] += stay
-            num_simulations_per_genre[recommendation] += 1
-            
-        return successes_per_genre, num_simulations_per_genre, total_successes, total_simulations
-
-
-    def calculate_staying_probability(self, L, S, p):
-        stay_prob = 5*L + S*(1 - L)#probability of staying in the system after not liking the clip and if liked the clip
-        # Normalize each row to sum to 1
-       # if max(L) >0.9: 
-        for i in range(len(stay_prob)):
-            stay_prob[i] = stay_prob[i] / stay_prob[i].sum()
-        S_adjusted = stay_prob
-        # TODO: The following doesn't make sense, especially reshaping p. 
-        # stay_prob_sum = stay_prob.sum(axis=1, keepdims=True)
-        #  # Calculate the user-weighted adjustment
-        #  # Reshape p to ensure correct broadcasting
-        # p_reshaped = p[:, np.newaxis]
-        # weighted_stay_prob = stay_prob * p_reshaped
-        # Normalize the adjusted probabilities to ensure they sum to 1 for each user
-        # S_adjusted = weighted_stay_prob / stay_prob_sum
-
-        return S_adjusted
-     
-    
+        self.p = p 
+        if Simulation._instance is None:
+            Simulation(L, S)  # Instantiate Simulation class if it hasn't been instantiated yet
+        self.simul_matrix = Simulation.get_simul_matrix()
+        self.recommendation = None
+        
 
     def recommend(self):
-        """_summary_
+        """Recommend the best genre for the user.
         
         Returns:
-        integer: The index of the clip that the recommender recommends to the user."""
-        
-        posterior = self.posterior_of_genres_recommendations
-        
-        #  Option 1: Randomly sample a genre to recommend
-        #recommendation = np.random.choice(range(len(posterior)), p=posterior)
-        
-        # Option 2: Recommend the item with the highest sampled like probability
-        recommendation = np.argmax(posterior)
-
-        self.recommended_item = recommendation
-        print("\nTurn number", self.i)
-        print("Recommended item:", self.recommended_item)
+        integer: The index of the clip that the recommender recommends to the user.
+        """
+        recommendation = np.argmax(self.simul_matrix.dot(self.p))
+        self.recommendation = recommendation
         return recommendation
-    
-    
 
     def update(self, signal):
-        """_summary_
-        
+        """Update the prior probabilities based on the user's response.
+
         Args:
         signal (integer): A binary variable that represents whether the user liked the recommended clip or not. 
-                          It is 1 if the user liked the clip, and 0 otherwise."""
-        self.i += 1
-        print("Signal:", signal)
-
-        self.successes_per_genre[self.recommended_item] += signal
-        self.num_simulations_per_genre[self.recommended_item] += 1
-        self.successes += signal
-        self.num_simulations += 1
-        posterior_of_genres_recommendations = self.posterior_of_genres_recommendations
-
-        p, S_adjusted = self.p, self.S_adjusted
-        num_genres = S_adjusted.shape[0]
+                        It is 1 if the user liked the clip, and 0 otherwise.
+        """
+        if signal:
+            # User liked the recommendation
+            likelihood = self.simul_matrix[self.recommendation]
+        else:
+            # User did not like the recommendation
+            likelihood = self.S[self.recommendation]
         
-        for i in range(num_genres):
-            genre_score = 0
-            for j in range(len(p)):
-                genre_score += S_adjusted[i, j] * p[j]
-
-            posterior_of_genres_recommendations[i] = genre_score* (self.successes_per_genre[i] / self.num_simulations_per_genre[i])**(1/2)  / (self.successes / self.num_simulations)**(1/2)
-            posterior_of_genres_recommendations[i] = posterior_of_genres_recommendations[i]**10
-            if (i == self.recommended_item) and signal:# more weight to the genres that are liked
-                    posterior_of_genres_recommendations[i] = posterior_of_genres_recommendations[i]**(1/2)
-            else:#less weight to the genres that are not liked
-                posterior_of_genres_recommendations[i] = posterior_of_genres_recommendations[i]**2
-        self.posterior_of_genres_recommendations = posterior_of_genres_recommendations / posterior_of_genres_recommendations.sum()  # Normalize to create a probability distribution
-        print("Posterior distribution:", self.posterior_of_genres_recommendations)
-       
+        # Update the prior with the likelihood
+        self.p *= likelihood
+        
+        # Normalize the probabilities to ensure they sum to 1
+        self.p /= np.sum(self.p)
 
 
+# class Simulation:
+#     _instance = None
+
+#     def __new__(cls, L=None, S=None, max_time=30, num_interactions=15):
+#         if cls._instance is None:
+#             cls._instance = super(Simulation, cls).__new__(cls)
+#             cls._instance._initialize(L, S, max_time, num_interactions)
+#         return cls._instance
+
+#     def _initialize(self, L, S, max_time, num_interactions):
+#         self.L = L
+#         self.S = S
+#         self.max_time = max_time
+#         self.num_interactions = num_interactions
+#         self.simul_matrix = self.calculate_simulation_matrix()
+
+#     def calculate_simulation_matrix(self):
+#         num_genres, num_user_types = self.L.shape
+#         simul_matrix = np.zeros((num_genres, num_user_types))
+
+#         start_time = time()
+#         num_iterations = np.zeros((num_genres, num_user_types))
+
+#         while time() - start_time < self.max_time:
+#             for g in range(num_genres):
+#                 for u in range(num_user_types):
+#                     cumulative_likes = 0
+#                     interactions = 0
+
+#                     for _ in range(self.num_interactions):
+#                         like = np.random.rand() < self.L[g, u]
+#                         stay = like or np.random.rand() < (self.L[g, u] + (1 - self.L[g, u]) * self.S[g, u])
+
+#                         if not stay:
+#                             break
+
+#                         cumulative_likes += like
+#                         interactions += 1
+
+#                     if interactions > 0:
+#                         num_iterations[g, u] += 1
+#                         simul_matrix[g, u] += (cumulative_likes - simul_matrix[g, u]) / num_iterations[g, u]
+
+#         return simul_matrix
+
+#     @staticmethod
+#     def get_simul_matrix():
+#         if Simulation._instance is None:
+#             raise ValueError("Simulation class has not been instantiated.")
+#         return Simulation._instance.simul_matrix
 
 
-
-
-
-
-
-
-
-# #THOMPSON SAMPLING
 # class Recommender:
-#     # Your recommender system class
-   
+
 #     def __init__(self, L, S, p):
-#         """_summary_
+#         """Initialize the Recommender system.
         
 #         Args:
-#         L (np.ndarray): A matrix in which the entry (i,j) represents the probability that a user of type j
-#                          will give a like to a clip from genre i.
-#         S (np.ndarray): A matrix in which the entry (i,j) represents the probability that a user of type j
+#         L (np.ndarray): A matrix where entry (i,j) represents the probability that a user of type j
+#                         will like a clip from genre i.
+#         S (np.ndarray): A matrix where entry (i,j) represents the probability that a user of type j
 #                         won't leave the system after being recommended a clip from genre i and not liking it.
-#         p (np.ndarray): The prior over user types. The entry i represents the probability that a user is of type i."""
-#         self.S=S
+#         p (np.ndarray): The prior over user types. Entry i is the probability that a user is of type i.
+#         """
+#         self.S = S
 #         self.L = L
-#         self.Stay_adjusted = self.calculate_staying_probability(L, S)
 #         self.p = p
-#         self.num_genres, self.num_user_types = L.shape
-#         self.successes = np.ones((self.num_genres, self.num_user_types))
-#         self.failures = np.ones((self.num_genres, self.num_user_types))
-#         self.posterior_of_genres_recommendations, self.successes_per_genre, self.num_simulations_per_genre, self.successes, self.num_simulations = self.simulate_staying()
-#       #  print(self.posterior_of_genres_recommendations)
+#         #self.simul_matrix = self.simulation(L, S)  # Compute the simulation matrix once
+#         self.recommendation = None
+#         #self.simul_matrix = simul_matrix
+#         self.simul_matrix = Simulation.get_simul_matrix() 
 
 
 
+#     def simulation(self, L, S):
+#         """Simulate user interactions based on like probabilities (L) and staying probabilities (S)."""
+#         num_genres, num_user_types = self.L.shape
+#         simul_matrix = np.zeros((num_genres, num_user_types))
+
+#         start_time =time()  # Corrected to use time.time() for start time capture
+#         num_iterations = np.zeros((num_genres, num_user_types))  # Each cell has its own iteration count
+
+#         while time() - start_time < 30:
+#             for g in range(num_genres):
+#                 for u in range(num_user_types):
+#                     cumulative_likes = 0
+#                     interactions = 0  # Track the number of interactions for this genre-user pair
+                
+#                     for _ in range(15):  # Assuming each user gets 15 interaction attempts
+#                         like = np.random.rand() < L[g, u]
+#                         stay = like or np.random.rand()  < (L[g, u]+(1 - L[g, u]) * S[g, u])
+                        
+#                         if not stay:
+#                             break
+
+#                         cumulative_likes += like
+#                         interactions += 1  # Increment interactions only if there was an interaction
+
+#                     if interactions > 0:  # Check to avoid division by zero
+#                         # Update the simulation matrix with the new average for this interaction session
+#                         num_iterations[g, u] += 1  # Increment the number of total iterations for this cell
+#                         simul_matrix[g, u] += (cumulative_likes - simul_matrix[g, u]) / num_iterations[g, u]
+#         return simul_matrix
 
 
-    # def simulate_staying(self):
-    #     p, Stay_adjusted = self.p, self.Stay_adjusted
-    #     num_genres = Stay_adjusted.shape[0]
-    #     successes_per_genre = np.ones(num_genres)
-    #     num_simulations_per_genre = np.ones(num_genres)
-    #     total_successes = 1
-    #     total_simulations = 1
-    #     posterior_of_genres_recommendations = np.zeros(num_genres)
-    #     time_limit = 10
-    #     start_time = time()
 
-    #     while time() - start_time < time_limit:
-    #         for i in range(num_genres):
-    #             genre_score = np.dot(Stay_adjusted[i], p)  # Simplified genre score calculation
-    #             posterior_of_genres_recommendations[i] = genre_score*((successes_per_genre[i] / num_simulations_per_genre[i]) ** (1/2))  / ((total_successes / total_simulations) ** (1/2))
-    #             posterior_of_genres_recommendations[i]=posterior_of_genres_recommendations[i]**10
-    #         posterior_of_genres_recommendations /= posterior_of_genres_recommendations.sum()  # Normalize to create a probability distribution
-    #       #  print("Posterior distribution:", posterior_of_genres_recommendations)
+#     def recommend(self):
+#         """Recommend the best genre for the user.
 
-    #         recommendation = np.random.choice(range(len(posterior_of_genres_recommendations)), p=posterior_of_genres_recommendations)
-    #         user = np.random.choice(range(len(p)), p=p)
+#         Returns:
+#         integer: The index of the clip that the recommender recommends to the user.
+#         """
+#         recommendation = np.argmax(self.simul_matrix.dot(self.p))
+#         self.recommendation = recommendation
+#         return recommendation
 
-    #         like = np.random.rand() < self.L[recommendation, user]
-    #         stay = 1 if like else (0.5 if np.random.rand() < self.S[recommendation, user] else 0)
 
-    #         total_successes += stay
-    #         total_simulations += 1
-    #         successes_per_genre[recommendation] += stay
-    #         num_simulations_per_genre[recommendation] += 1
+
+#     def update(self, signal):
+#         """Update the prior probabilities based on the user's response.
+
+#         Args:
+#         signal (integer): A binary variable that represents whether the user liked the recommended clip or not. 
+#                         It is 1 if the user liked the clip, and 0 otherwise.
+#         """
+#         if signal:
+#             # User liked the recommendation
+#             likelihood = self.simul_matrix[self.recommendation]
+#         else:
+#             # User did not like the recommendation
+#             likelihood = self.S[self.recommendation]
         
-    #     return posterior_of_genres_recommendations, successes_per_genre, num_simulations_per_genre, total_successes, total_simulations
-
-
-
-
-
-    # def calculate_staying_probability(self, L, S):
-    #     stay_prob = 1*L + 5*S * (1 - L)#probability of staying in the system after not liking the clip and if liked the clip
-    #     # Normalize each row to sum to 1
-    #    # if max(L) >0.9: 
-    #     S_adjusted = stay_prob / stay_prob.sum(axis=1, keepdims=True)
-    #     return S_adjusted
-    
-
-    # def recommend(self):
-    #     """_summary_
+#         # Update the prior with the likelihood
+#         self.p *= likelihood
         
-    #     Returns:
-    #     integer: The index of the clip that the recommender recommends to the user."""
+#         # Normalize the probabilities to ensure they sum to 1
+#         self.p /= np.sum(self.p)
 
-    #     posterior = self.posterior_of_genres_recommendations
-        
-    #     #  Option 1: Randomly sample a genre to recommend
-    #     #recommendation = np.random.choice(range(len(posterior)), p=posterior)
-        
-    #     # Option 2: Recommend the item with the highest sampled like probability
-    #     recommendation = np.argmax(posterior)
-
-    #     self.recommended_item = recommendation
-    #    # print("recommendation", recommendation)
-    #     return recommendation
-    
-    
-    # def update(self, signal):
-    #     """_summary_
-        
-    #     Args:
-    #     signal (integer): A binary variable that represents whether the user liked the recommended clip or not. 
-    #                       It is 1 if the user liked the clip, and 0 otherwise."""
-        
-    #     self.successes_per_genre[self.recommended_item] += signal
-    #     self.num_simulations_per_genre[self.recommended_item] += 1
-    #     self.successes += signal
-    #     self.num_simulations += 1
-    #     posterior_of_genres_recommendations = np.zeros(self.num_genres)
-
-    #     p, Stay_adjusted = self.p, self.Stay_adjusted
-    #     num_genres = Stay_adjusted.shape[0]
-
-    #     for i in range(num_genres):
-    #         genre_score = 0
-    #         for j in range(len(p)):
-    #             genre_score += Stay_adjusted[i, j] * p[j]
-
-    #         posterior_of_genres_recommendations[i] = genre_score* (self.successes_per_genre[i] / self.num_simulations_per_genre[i])**(1/2)  / (self.successes / self.num_simulations)**(1/2)
-    #         posterior_of_genres_recommendations[i]=posterior_of_genres_recommendations[i]**10
-    #     self.posterior_of_genres_recommendations = posterior_of_genres_recommendations / posterior_of_genres_recommendations.sum()  # Normalize to create a probability distribution
-
-    
-# an example of a recommender that always recommends the item with the highest probability of being liked
-class GreedyRecommender:
-    def __init__(self, L, S, p):
-        self.L = L
-        self.S = S
-        self.p = p
-        
-    def recommend(self):
-        return np.argmax(np.dot(self.L, self.p))
-    
-    def update(self, signal):
-        pass
-
-
-
-# an example of a recommender that always recommends the item with the highest probability of being liked
-class GreedyRecommender:
-    def __init__(self, L, S, p):
-        self.L = L
-        self.S = S
-        self.p = p
-        
-    def recommend(self):
-        return np.argmax(np.dot(self.L, self.p))
-    
-    def update(self, signal):
-        pass
 
 
