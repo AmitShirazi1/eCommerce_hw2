@@ -125,6 +125,7 @@ if __name__ == "__main__":
     # print(num_of_likes)
 
     
+
     # num_of_likes = simulate_interaction(L1, S1, p1)
     # print("1:", num_of_likes)
     # num_of_likes = simulate_interaction(L2, S2, p2)
@@ -139,14 +140,6 @@ if __name__ == "__main__":
     # print("4:", num_of_likes)
     # num_of_likes = simulate_interaction(L5, S5, p5)
     # print("5:", num_of_likes)
-
-
-
-
-
-
-
-
 
 
     def test(L, S, p):

@@ -78,10 +78,11 @@ class Recommender:
             Simulation(L, S)  # Instantiate Simulation class if it hasn't been instantiated yet
         self.simul_matrix = Simulation.get_simul_matrix()
         self.recommendation = None
+        
 
     def recommend(self):
         """Recommend the best genre for the user.
-
+        
         Returns:
         integer: The index of the clip that the recommender recommends to the user.
         """
