@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 ID*.csv
 *.ipynb
+*.docx
