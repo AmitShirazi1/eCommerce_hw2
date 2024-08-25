@@ -1,7 +1,6 @@
 import numpy as np
-from ID1_ID2_part2 import Recommender
+from part2 import Recommender
 import time
-from scipy import stats 
 
 MAX_HORIZON = 15
 
@@ -122,74 +121,24 @@ p5 = np.array([0.11, 0.12, 0.07, 0.1, 0.05, 0.13, 0.1, 0.11, 0.11, 0.1])
 
 if __name__ == "__main__":
     # num_of_likes = simulate_interaction(L1, S1, p1)
-    # print("1:", num_of_likes)
-    # num_of_likes = simulate_interaction(L2, S2, p2)
-    # print("2:", num_of_likes)
-    # num_of_likes = simulate_interaction(L3, S3, p3a)
-    # print("3a:", num_of_likes)
-    # num_of_likes = simulate_interaction(L3, S3, p3b)
-    # print("3b:", num_of_likes)
-    # num_of_likes = simulate_interaction(L3, S3, p3c)
-    # print("3c:", num_of_likes)
-    # num_of_likes = simulate_interaction(L4, S4, p4)
-    # print("4:", num_of_likes)
-    # num_of_likes = simulate_interaction(L5, S5, p5)
-    # print("5:", num_of_likes)
-
-
-    def test(L, S, p):
-        num_of_likes = []
-        for _ in range(5000):
-            num_of_likes.append(simulate_interaction(L, S, p))
-        
-        mean_likes = np.mean(num_of_likes)
-        std_likes = np.std(num_of_likes, ddof=1)  # Sample standard deviation
-        n = len(num_of_likes)
-        standard_error = std_likes / np.sqrt(n)
-        
-        # 95% confidence interval
-        confidence_level = 0.95
-        degrees_freedom = n - 1
-        t_critical = stats.t.ppf((1 + confidence_level) / 2, degrees_freedom)
-        margin_of_error = t_critical * standard_error
-        
-        confidence_interval = (mean_likes - margin_of_error, mean_likes + margin_of_error)
-        
-        print(f"Mean number of likes: {mean_likes}")
-        print(f"95% Confidence interval: {confidence_interval}")
-        
-        return mean_likes
-
-
-
-    # def test(L, S, p):
-    #     num_of_likes = list()
-    #     for _ in range(100):
-    #         num_of_likes.append(simulate_interaction(L, S, p))
-    #     print(num_of_likes)    
-    #     variance_likes = 
-    #     return sum(num_of_likes)/len(num_of_likes)
+    # print(num_of_likes)
     
-                                                                            #  #  With deep copy 
-                                                                                                                #  BEST SCORES
-    # result = test(L1, S1, p1)
-    # print("SCORE TEST 1:", result, "pass" if result>4.65 else "fail")    #        SCORE TEST 1: 4.7202 pass       95% Confidence interval: (4.596411069951142, 4.843988930048859)                                                                       
-    # result = test(L2, S2, p2)
-    # print("\n", "-"*20, "\n")                                                                                                                                                  
-    # print("SCORE TEST 2:", result, "pass" if result>5.6 else "fail")           #SCORE TEST 2: 5.629 pass    95% Confidence interval: (5.4941352385338895, 5.76386476146611)
+    def expectation(L, S, p, thres):
+        num_of_likes = list()
+        iters = 40000
+        for _ in range(iters):
+            num_of_likes.append(simulate_interaction(L, S, p))
+        average = sum(num_of_likes) / iters
+        print("V" if average > thres else "X", "-", average)
+    
+    expectation(L1, S1, p1, 4.65)
+    expectation(L2, S2, p2, 5.6)
+    expectation(L3, S3, p3a, 12.4)
+    expectation(L3, S3, p3b, 6.1)
+    expectation(L3, S3, p3c, 6.77)
+    expectation(L4, S4, p4, 5.43)
+    expectation(L5, S5, p5, 6.4)
 
-    # result = test(L3, S3, p3a)                                              #SCORE TEST 2: 5.6246 pass     95% Confidence interval: (5.489259741757225, 5.759940258242775)                                                                                            
-    # print("\n", "-"*20, "\n")
-    # print("SCORE TEST 3a:", result, "pass" if result>12.4 else "fail")      #  SCORE TEST 3a: 12.4626 pass     95% Confidence interval: (12.320492521288875, 12.604707478711125
-    # result = test(L3, S3, p3b)
-    # print("\n", "-"*20, "\n")
-    # print("SCORE TEST 3b:", result, "pass" if result>6.1 else "fail")      #SCORE TEST 3b: 6.1122 pass    95% Confidence interval: (5.9464271780878155, 6.277972821912184)                                                                                   #TEST3B 8.65  PASS  95% Confidence interval: (7.873231031871523, 9.426768968128478)
-    # result = test(L3, S3, p3c)
-    # print("\n", "-"*20, "\n")
-    # print("SCORE TEST 3c:", result, "pass" if result>6.77 else "fail")     #SCORE TEST 3c: 6.7786 pass     95% Confidence interval: (6.611159540340323, 6.9460404596596765)                                                                                        #TEST3c 7.896  PASS 95% Confidence interval: (7.400664128652017, 8.391335871347982
-    # result = test(L4, S4, p4)
-    # print("\n", "-"*20, "\n")
-    # print("SCORE TEST 4:", result, "pass" if result>5.43 else "fail")      # SCORE TEST 4: 6.4286 pass        95% Confidence interval: (6.266846561323475, 6.590353438676526)           
-    result = test(L5, S5, p5)
-    print("\n", "-"*20, "\n")
-    print("SCORE TEST 5:", result, "pass" if result>6.4 else "fail")       #SCORE TEST 5: 6.63 pass     95% Confidence interval: (6.312302383948852, 6.619297616051147)                                                                                   
+
+
+    

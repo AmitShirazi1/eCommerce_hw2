@@ -1,6 +1,5 @@
 import numpy as np
 from time import time
-from matrix_calc import simul_matrix
 from copy import deepcopy
 
 
@@ -9,7 +8,7 @@ class Simulation:
     _instance = None # 
 
     def __new__(cls, L=None, S=None, max_time=60, num_interactions=15):
-        if cls._instance is None:
+        if (cls._instance is None) or ((not np.array_equal(cls._instance.L, L)) or (not np.array_equal(cls._instance.S, S))):
             cls._instance = super(Simulation, cls).__new__(cls)
             cls._instance._initialize(L, S, max_time, num_interactions)
         return cls._instance
@@ -73,10 +72,9 @@ class Recommender:
         """
         self.S = S
         self.L = L
-        self.p = deepcopy(p) 
-        if Simulation._instance is None:
-            Simulation(L, S)  # Instantiate Simulation class if it hasn't been instantiated yet
-        self.simul_matrix = Simulation.get_simul_matrix()
+        self.p = deepcopy(p)
+        self.simulation_instance = Simulation(L, S)  # Instantiate Simulation class if it hasn't been instantiated yet
+        self.simul_matrix = self.simulation_instance.get_simul_matrix()
         self.recommendation = None
 
     def recommend(self):
